@@ -1,0 +1,86 @@
+SEAS — DTR RE-ACTIVATE (HOSTING) — 18 Aug 2026
+==============================================
+
+WHAT THIS ZIP IS FOR
+--------------------
+Field executives can request re-opening of a finished DTR (after Finish DTR)
+so they can survey more consumers. Manager / PM / Admin approve or reject
+on the web. Admins can also Re-open directly from DTR Surveys browse.
+
+Production Laravel root: /home/mrhari/mrhari.co.in/
+Extract so paths land as app/, resources/, routes/ — NOT nested under backend/.
+
+APK / FLUTTER
+-------------
+YES — FE “Request re-activate” UI needs a NEW APK rebuild from:
+  DTR-reactivate-Aug18-FLUTTER-SOURCE.zip
+
+Web-only deploy of THIS hosting zip is enough for:
+  - /dtr-reactivation (pending Approve / Reject)
+  - DTR Surveys → Re-open on finished rows
+  - API endpoints (request works once APK is updated)
+
+Offline note: re-activation request is ONLINE-ONLY (same as Finish DTR /
+consumer verify). No offline queue for this request.
+
+ZIP STRUCTURE (no backend/ or mobile/ prefix)
+---------------------------------------------
+  DEPLOY.txt
+  ENSURE-dtr-reactivation.sql
+  app/...
+  resources/...
+  routes/...
+  database/migrations/...
+
+DEPLOY STEPS (English)
+----------------------
+1) BACKUP: export DB (at least dtr_surveys) and keep a copy of PHP files you overwrite.
+2) SQL (recommended once; safe to re-run):
+   phpMyAdmin → SEAS database → SQL → run ENSURE-dtr-reactivation.sql
+   Confirm final SELECT lists dtr_reactivation_requests columns.
+3) Upload / overwrite files from this zip into Laravel root
+   (same level as artisan, app/, public/).
+4) Clear caches from Laravel root (SSH / terminal):
+     php artisan optimize:clear
+   Optional:
+     php artisan migrate --force
+5) Smoke test:
+   - FE (new APK): Consumer → Completed DTR → Request re-activate
+   - Web: Operations → DTR Re-activation → Approve
+   - FE refresh: DTR appears under Active again → survey → Finish DTR
+   - Or: DTR Surveys → filter Consumer Completed → Re-open
+
+DEPLOY STEPS (Hindi / Hinglish)
+-------------------------------
+1) Pehle DB backup lo (dtr_surveys) aur overwrite hone wale PHP files ka copy rakh lo.
+2) phpMyAdmin me ENSURE-dtr-reactivation.sql chalao (dobara chalana safe hai).
+3) Is HOSTING zip ko /home/mrhari/mrhari.co.in/ pe extract/upload karo —
+   app/, resources/, routes/ seedha root me aane chahiye (backend/ folder NAHI).
+4) Terminal me:
+     php artisan optimize:clear
+5) FE request UI ke liye naya APK banana/install karna zaroori hai
+   (FLUTTER-SOURCE zip se rebuild).
+   Manager web pe: Operations → DTR Re-activation → Approve.
+   Ya DTR Surveys me finished row pe Re-open.
+
+HOW IT WORKS
+------------
+Finish DTR sets dtr_surveys.consumer_survey_completed_at → locks consumer entry.
+Approve / Re-open clears that timestamp → FE can survey again and Finish again.
+
+FILES
+-----
+app/Models/DtrReactivationRequest.php          (new)
+app/Models/DtrSurvey.php                       (relation)
+app/Support/DtrConsumerReopen.php              (new)
+app/Http/Controllers/DtrReactivationController.php (new)
+app/Http/Controllers/Api/FieldApiController.php
+resources/views/dtr-reactivation/index.blade.php (new)
+resources/views/dtr-surveys/index.blade.php    (Re-open button)
+resources/views/layouts/app.blade.php          (nav)
+routes/web.php
+routes/api.php
+database/migrations/2026_08_18_160000_create_dtr_reactivation_requests_table.php
+ENSURE-dtr-reactivation.sql
+
+DO NOT extract any ALL zip that contains backend/ or mobile/ into production root.

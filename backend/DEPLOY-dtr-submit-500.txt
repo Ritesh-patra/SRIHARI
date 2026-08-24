@@ -1,0 +1,47 @@
+SEAS — FIX DTR Survey Submit 500 (17 Aug 2026)
+===============================================
+
+ROOT CAUSE (most likely)
+------------------------
+Production `dtr_surveys` table is missing newer columns that the Field API
+writes on Submit, especially:
+  - lt_line_type
+  - mapping_correction_status / master_feeder_id / reported_feeder_id / …
+MySQL returns "Unknown column …" → Laravel 500 → app shows
+"Saved offline (sync pending): Server error (500) — no useful API message".
+
+WHAT THIS ZIP CONTAINS (no `backend/` prefix — extract into Laravel root)
+------------------------------------------------------------------------
+  app/Http/Controllers/Api/FieldApiController.php
+  app/Support/LtLineType.php
+  database/migrations/2026_08_06_153000_add_mapping_correction_to_dtr_surveys.php
+  FIX-dtr-submit-missing-columns.sql
+  DEPLOY.txt   (this file)
+
+DEPLOY STEPS (hosting)
+----------------------
+1) BACKUP: export `dtr_surveys` (or full DB) from phpMyAdmin.
+2) SQL FIRST (critical):
+   phpMyAdmin → select SEAS database → SQL → paste/run
+   `FIX-dtr-submit-missing-columns.sql`
+   Confirm the final SELECT lists the new columns.
+3) Upload / overwrite PHP files from this zip into the Laravel app root
+   (same level as `artisan`, `app/`, `public/`):
+     - app/Http/Controllers/Api/FieldApiController.php
+     - app/Support/LtLineType.php
+     - database/migrations/… (optional on shared hosting if you only run SQL)
+4) Clear caches (SSH or hosting terminal), from Laravel root:
+     php artisan optimize:clear
+   Or delete files under `bootstrap/cache/*.php` if artisan is unavailable.
+5) Field app: logout/login → open DTR Survey → Submit again.
+   If something still fails, API JSON `message` should now say which column
+   is missing (no more silent 500).
+
+FILES TO OVERWRITE
+------------------
+  app/Http/Controllers/Api/FieldApiController.php
+  app/Support/LtLineType.php
+
+DO NOT skip the SQL — code alone will soft-skip missing columns so submit
+can succeed, but LT Line Type / mapping correction will not persist until
+columns exist.

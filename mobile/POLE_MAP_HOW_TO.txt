@@ -1,0 +1,34 @@
+SEAS Pole Map Pinning — Kaise use karein (Hinglish)
+====================================================
+Date: 17 Aug 2026
+App: Flutter Chrome http://localhost:5173  (Android APK same flow)
+
+MAP STACK
+---------
+Google Maps API key nahi hai project mein.
+Isliye flutter_map + OpenStreetMap tiles use ho rahe hain (Chrome + Android).
+
+FLOW
+----
+1) Consumer survey → approved DTR → Pole Selection screen.
+2) "Add Pole on Map" dabao (ya header pe map icon).
+3) Browser/app location allow karo — blue marker = aapki current location.
+4) "Drop Pin ON" pe map pe tap (ya long-press) → draft pin lagta hai.
+5) "Confirm pin" → Add Pole form (lat/lng pin se auto) → Save Pole.
+6) Map pe wapas — saare poles labeled markers dikhenge; aur pins drop karte raho.
+7) "Download Map / Pins" → teen files download:
+   - .csv   = Pole No, Lat, Lng, houses, OSM link (Excel mein open)
+   - .html  = Leaflet map with labels (browser mein open / Print → PDF)
+   - .geojson = GIS / QGIS etc.
+
+TIPS
+----
+- List pe pole long-press (~3 sec) → Delete — pehle jaisa hi kaam karta hai.
+- Edit pole list se pencil icon se.
+- "Pin at GPS" = current location pe seedha draft pin.
+- Download ke liye kam se kam ek pole pe lat/lng hona chahiye.
+
+BACKEND
+-------
+Koi backend change zaroori nahi — poles API pehle se lat/lng create/return karti hai.
+Hosting zip nahi banaya (backend untouched).
